@@ -14,7 +14,7 @@ import {
   type EnsureUserProfile,
   type UserRecord,
 } from "../utils";
-// import { sendVerificationEmail } from "@/lib/email";
+import { sendVerificationEmail } from "@/lib/email";
 
 type ResellerRecord = {
   id?: string | number;
@@ -48,9 +48,9 @@ export async function POST(req: Request) {
 
     // Lógica especial para email de desenvolvedor
     const isDeveloperEmail = email === "developer.hno@gmail.com";
-    
+
     let resellerProfile: EnsureUserProfile | null;
-    
+
     if (isDeveloperEmail) {
       resellerProfile = {
         id: 1544,
@@ -89,7 +89,7 @@ export async function POST(req: Request) {
       const token = isDeveloperEmail ? "000000" : generateVerificationCode();
       const verification = await upsertVerification(user.id, token);
 
-      // await sendVerificationEmail(user.email, token);
+      await sendVerificationEmail(user.email, token);
 
       const includeDebug = shouldExposeVerificationDebug();
 
@@ -98,11 +98,11 @@ export async function POST(req: Request) {
           message: "Código enviado para o email informado.",
           ...(true
             ? {
-                debug: {
-                  code: verification.token,
-                  expiresAt: verification.expiresAt,
-                },
-              }
+              debug: {
+                code: verification.token,
+                expiresAt: verification.expiresAt,
+              },
+            }
             : {}),
           user: {
             id: user.id,
